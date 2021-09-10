@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\TareaController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,3 +22,5 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::resource('tareas', TareaController::class);
+Route::put('/check/{id}', [TareaController::class, 'check'])->name('tareas.check');

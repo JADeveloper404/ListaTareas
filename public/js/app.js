@@ -2118,6 +2118,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -2127,8 +2139,104 @@ __webpack_require__.r(__webpack_exports__);
         fecha: '',
         check: false
       },
-      check: false
+      tareas: [],
+      mensaje: '',
+      modificar: false,
+      id: 0,
+      config: {
+        show: '',
+        color: '',
+        display: ''
+      }
     };
+  },
+  methods: {
+    listar: function listar() {
+      var _this = this;
+
+      axios.get('/tareas').then(function (res) {
+        _this.tareas = res.data;
+      });
+    },
+    checked: function checked(value, id) {
+      var _this2 = this;
+
+      if (value) {
+        value = false;
+      } else {
+        value = true;
+      }
+
+      axios.put('/check/' + id, {
+        data: value
+      }).then(function (res) {
+        _this2.mensaje = res.data.mensaje;
+        _this2.config.color = 'alert-warning';
+        _this2.config.show = 'show';
+        _this2.config.display = 'd-block';
+      });
+    },
+    seleccionar: function seleccionar() {
+      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      if (this.modificar) {
+        this.tarea.nombre = data.nombre;
+        this.id = data.id;
+        this.tarea.descripcion = data.descripcion;
+        this.tarea.fecha = data.fecha;
+        this.tarea.check = data.check;
+      } else {
+        this.tarea.nombre = '';
+        this.tarea.descripcion = '';
+        this.tarea.fecha = '';
+        this.tarea.check = false;
+      }
+    },
+    guardar: function guardar() {
+      var _this3 = this;
+
+      if (this.modificar) {
+        axios.put('/tareas/' + this.id, {
+          data: this.tarea
+        }).then(function (res) {
+          _this3.mensaje = res.data.mensaje;
+
+          _this3.listar();
+
+          _this3.config.color = 'alert-success';
+          _this3.config.show = 'show';
+          _this3.config.display = 'd-block';
+        });
+      } else {
+        axios.post('/tareas', {
+          data: this.tarea
+        }).then(function (res) {
+          _this3.mensaje = res.data.mensaje;
+
+          _this3.listar();
+
+          _this3.config.color = 'alert-success';
+          _this3.config.show = 'show';
+          _this3.config.display = 'd-block';
+        });
+      }
+    },
+    eliminar: function eliminar(id) {
+      var _this4 = this;
+
+      axios["delete"]('/tareas/' + id).then(function (res) {
+        _this4.mensaje = res.data.mensaje;
+
+        _this4.listar();
+
+        _this4.config.color = 'alert-danger';
+        _this4.config.show = 'show';
+        _this4.config.display = 'd-block';
+      });
+    }
+  },
+  created: function created() {
+    this.listar();
   }
 });
 
@@ -37693,140 +37801,241 @@ var render = function() {
     _vm._v(" "),
     _c("hr"),
     _vm._v(" "),
+    _c(
+      "button",
+      {
+        staticClass: "btn btn-primary",
+        on: {
+          click: function($event) {
+            _vm.modificar = false
+            _vm.seleccionar()
+          }
+        }
+      },
+      [_vm._v("Nuevo")]
+    ),
+    _vm._v(" "),
+    _c("hr"),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "alert alert-dismissible fade my-4 d-none",
+        class: [_vm.config.show, _vm.config.color, _vm.config.display],
+        attrs: { role: "alert" }
+      },
+      [_vm._v("\n        " + _vm._s(_vm.mensaje) + "\n        "), _vm._m(0)]
+    ),
+    _vm._v(" "),
     _c("div", { staticClass: "row" }, [
       _c("div", { staticClass: "col-md-4" }, [
-        _c("form", [
-          _c("div", { staticClass: "form-group" }, [
-            _c("label", { attrs: { for: "nombre" } }, [_vm._v("Nombre")]),
-            _vm._v(" "),
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.tarea.nombre,
-                  expression: "tarea.nombre"
-                }
-              ],
-              staticClass: "form-control",
-              attrs: {
-                type: "text",
-                name: "nombre",
-                placeholder: "Escribe el Nombre"
-              },
-              domProps: { value: _vm.tarea.nombre },
-              on: {
-                input: function($event) {
-                  if ($event.target.composing) {
-                    return
-                  }
-                  _vm.$set(_vm.tarea, "nombre", $event.target.value)
-                }
+        _c("div", { staticClass: "form-group" }, [
+          _c("label", { attrs: { for: "nombre" } }, [_vm._v("Nombre")]),
+          _vm._v(" "),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.tarea.nombre,
+                expression: "tarea.nombre"
               }
-            })
+            ],
+            staticClass: "form-control",
+            attrs: {
+              type: "text",
+              name: "nombre",
+              placeholder: "Escribe el Nombre"
+            },
+            domProps: { value: _vm.tarea.nombre },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.$set(_vm.tarea, "nombre", $event.target.value)
+              }
+            }
+          })
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group" }, [
+          _c("label", { attrs: { for: "decripcion" } }, [
+            _vm._v("Descripcion")
           ]),
           _vm._v(" "),
-          _c("div", { staticClass: "form-group" }, [
-            _c("label", { attrs: { for: "decripcion" } }, [
-              _vm._v("Descripcion")
-            ]),
-            _vm._v(" "),
-            _c("textarea", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.tarea.descripcion,
-                  expression: "tarea.descripcion"
-                }
-              ],
-              staticClass: "form-control",
-              attrs: {
-                name: "decripcion",
-                placeholder: "Escribe la Descripción"
-              },
-              domProps: { value: _vm.tarea.descripcion },
-              on: {
-                input: function($event) {
-                  if ($event.target.composing) {
-                    return
-                  }
-                  _vm.$set(_vm.tarea, "descripcion", $event.target.value)
-                }
+          _c("textarea", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.tarea.descripcion,
+                expression: "tarea.descripcion"
               }
-            })
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "form-group" }, [
-            _c("label", { attrs: { for: "fecha" } }, [_vm._v("Fecha")]),
-            _vm._v(" "),
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.tarea.fecha,
-                  expression: "tarea.fecha"
+            ],
+            staticClass: "form-control",
+            attrs: {
+              name: "decripcion",
+              placeholder: "Escribe la Descripción"
+            },
+            domProps: { value: _vm.tarea.descripcion },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
                 }
-              ],
-              staticClass: "form-control",
-              attrs: {
-                type: "date",
-                name: "fecha",
-                placeholder: "Escribe la Fecha"
-              },
-              domProps: { value: _vm.tarea.fecha },
-              on: {
-                input: function($event) {
-                  if ($event.target.composing) {
-                    return
-                  }
-                  _vm.$set(_vm.tarea, "fecha", $event.target.value)
-                }
+                _vm.$set(_vm.tarea, "descripcion", $event.target.value)
               }
-            })
-          ]),
+            }
+          })
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group" }, [
+          _c("label", { attrs: { for: "fecha" } }, [_vm._v("Fecha")]),
           _vm._v(" "),
-          _c("button", { staticClass: "btn btn-success" }, [_vm._v("Guardar")])
-        ])
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.tarea.fecha,
+                expression: "tarea.fecha"
+              }
+            ],
+            staticClass: "form-control",
+            attrs: {
+              type: "date",
+              name: "fecha",
+              placeholder: "Escribe la Fecha"
+            },
+            domProps: { value: _vm.tarea.fecha },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.$set(_vm.tarea, "fecha", $event.target.value)
+              }
+            }
+          })
+        ]),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-success",
+            on: {
+              click: function($event) {
+                return _vm.guardar()
+              }
+            }
+          },
+          [_vm._v("Guardar")]
+        )
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "col-md-8" }, [
-        _c("table", { staticClass: "table table-dark" }, [
-          _vm._m(0),
+        _c("table", { staticClass: "table table-success table-striped" }, [
+          _vm._m(1),
           _vm._v(" "),
-          _c("tbody", [
-            _c("tr", [
-              _c("th", { attrs: { scope: "row" } }, [_vm._v("1")]),
-              _vm._v(" "),
-              _c("td", [_vm._v("Estudiar Programación")]),
-              _vm._v(" "),
-              _c("td", [
-                _vm._v(
-                  "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Voluptatem, repudiandae!"
-                )
-              ]),
-              _vm._v(" "),
-              _c("td", [_vm._v("10-20-2021")]),
-              _vm._v(" "),
-              _c("td", { staticClass: "text-center" }, [
-                _c("div", { staticClass: "form-check form-switch" }, [
-                  { checked: "checked" }
-                    ? _c("input", {
-                        staticClass: "form-check-input",
-                        attrs: { type: "checkbox" }
-                      })
-                    : _vm._e()
+          _c(
+            "tbody",
+            _vm._l(_vm.tareas, function(task) {
+              return _c("tr", { key: task.id }, [
+                _c("th", { attrs: { scope: "row" } }, [
+                  _vm._v(_vm._s(task.id))
+                ]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(task.nombre))]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(task.descripcion))]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(task.fecha))]),
+                _vm._v(" "),
+                _c("td", { staticClass: "text-center" }, [
+                  _c("div", { staticClass: "form-check form-switch" }, [
+                    _c("input", {
+                      staticClass: "form-check-input",
+                      attrs: { type: "checkbox", id: "check" },
+                      domProps: { checked: task.check },
+                      on: {
+                        click: function($event) {
+                          return _vm.checked(task.check, task.id)
+                        },
+                        input: function($event) {
+                          task.check = $event.target.checked
+                        }
+                      }
+                    })
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("td", [
+                  _c(
+                    "div",
+                    {
+                      staticClass: "btn-group",
+                      attrs: { role: "group", "aria-label": "" }
+                    },
+                    [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-warning mx-2",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              _vm.modificar = true
+                              _vm.seleccionar(task)
+                            }
+                          }
+                        },
+                        [_vm._v("Editar")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-danger mx-2",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.eliminar(task.id)
+                            }
+                          }
+                        },
+                        [_vm._v("Eliminar")]
+                      )
+                    ]
+                  )
                 ])
               ])
-            ])
-          ])
+            }),
+            0
+          )
         ])
       ])
     ])
   ])
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "close",
+        attrs: {
+          type: "button",
+          "data-dismiss": "alert",
+          "aria-label": "Close"
+        }
+      },
+      [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+    )
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -37843,7 +38052,9 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Realizada")]),
         _vm._v(" "),
-        _c("th", { attrs: { colspan: "2" } }, [_vm._v("Acción")])
+        _c("th", { staticClass: "text-center", attrs: { colspan: "2" } }, [
+          _vm._v("Acción")
+        ])
       ])
     ])
   }
